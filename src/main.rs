@@ -1,4 +1,8 @@
+mod db_module;
+
 use rusqlite::{Connection, Result};
+use db_module::{get_cafes, Cafe};
+
 
 fn main() -> Result<()> {
 
@@ -10,21 +14,12 @@ fn main() -> Result<()> {
     }
     let conn = Connection::open("my_database.db")?;
 
-    // Additional operations such as creating tables or inserting data can be done here
-   // let mut stmt = conn.prepare("INSERT INTO cafe (name, description) VALUES (?,?)")?;
-   // stmt.execute(["petersCafe", "the nice place"])?;
+    // fetch cafes using the module
+    let cafes = get_cafes(&conn)?;
 
 
-    let mut stmt = conn.prepare("SELECT  name, description FROM cafe")?;
-    let cafe_iter = stmt.query_map([], |row| {
-        Ok(Cafe {
-            name: row.get(0)?,
-            description: row.get(1)?,
-        })
-    })?;
-
-    for cafe in cafe_iter {
-        println!("Found cafe {:?}", cafe?);
+    for cafe in cafes {
+        println!("Found cafe {:?}", cafe);
     }
 
     Ok(())
